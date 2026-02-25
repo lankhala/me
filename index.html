@@ -9,18 +9,18 @@
 <body>
 <div class="app-container">
     <header>
-        <span id="header-title">My Balance</span>
+        <span id="header-title">កាបូបលុយរបស់ខ្ញុំ</span>
         <div class="balance-display" id="main-stat">$ 0.00</div>
     </header>
-
-    <main>
+    <center>
+        <main>
         <div id="finance-page" class="page active-page">
             <div class="input-card">
-                <input type="text" id="fin-desc" placeholder="ពិពណ៌នា (ឧទាហរណ៍៖ ញ៉ាំបាយ)">
+                <input type="text" id="fin-desc" placeholder="ប្រតិបត្តការរបស់អ្នក">
                 <input type="number" id="fin-amount" placeholder="ចំនួនទឹកប្រាក់ ($)">
                 <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <button class="btn btn-add" onclick="saveTransaction('in')">ចំណូល (+)</button>
-                    <button class="btn btn-add" style="background:var(--danger)" onclick="saveTransaction('out')">ចំណាយ (-)</button>
+                    <button class="btn btn-add" onclick="saveTransaction('in')">ចំណូល</button>
+                    <button class="btn btn-add" style="background:var(--danger)" onclick="saveTransaction('out')">ចំណាយ</button>
                 </div>
             </div>
             <div id="finance-list"></div>
@@ -34,6 +34,9 @@
             <div id="task-list"></div>
         </div>
     </main>
+
+    </center>
+    
 
     <nav>
         <div class="nav-item active" onclick="switchPage('finance', this)">💰 ហិរញ្ញវត្ថុ</div>

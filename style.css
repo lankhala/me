@@ -1,4 +1,7 @@
-        
+        @font-face{
+            font-family: 'Inter';
+            src: url('MiSansKhmer-Demibold.otf') format('opentype');
+        }
         
         /* --- CSS STYLING --- */
         :root {
@@ -38,7 +41,6 @@
 
         .balance-display {
             font-size: 2rem;
-            font-weight: bold;
             margin: 10px 0;
         }
 
@@ -52,19 +54,17 @@
         .active-page { display: block; }
 
         .input-card {
-            background: #fff;
             padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             margin-bottom: 20px;
         }
 
         input {
-            width: 80%;
+            width: 100%;
             padding: 12px;
             margin: 5px 0;
+            font-family: 'inter', sans-serif;
             border: 1px solid #ddd;
-            border-radius: 8px;
+            border-radius: 50px;
             outline: none;
         }
 
@@ -72,10 +72,10 @@
             width: 100%;
             padding: 12px;
             border: none;
-            border-radius: 8px;
+            border-radius: 50px;
             cursor: pointer;
-            font-weight: bold;
             transition: 0.3s;
+            font-family: 'inter', sans-serif;
         }
 
         .btn-add { background: var(--primary); color: white; }
@@ -90,8 +90,8 @@
             border-bottom: 1px solid #eee;
         }
 
-        .amount-pos { color: var(--secondary); font-weight: bold; }
-        .amount-neg { color: var(--danger); font-weight: bold; }
+        .amount-pos { color: var(--secondary); }
+        .amount-neg { color: var(--danger); }
 
         nav {
             display: flex;
@@ -111,5 +111,4 @@
 
         .nav-item.active {
             color: var(--primary);
-            font-weight: bold;
         }

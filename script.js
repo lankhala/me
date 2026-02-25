@@ -27,8 +27,6 @@
     function saveTransaction(type) {
         const desc = document.getElementById('fin-desc').value;
         let amount = parseFloat(document.getElementById('fin-amount').value);
-
-        if (!desc || !amount) return alert("សូមបញ្ចូលព័ត៌មានឱ្យគ្រប់!");
         
         if (type === 'out') amount = -Math.abs(amount);
 
