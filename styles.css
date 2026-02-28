@@ -46,7 +46,7 @@ body {
 
 /* --- Header Section --- */
 .header {
-    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    background-image: url(cat.gif);
     color: white;
     padding: 3rem 2rem;
     text-align: center;
