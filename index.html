@@ -2,47 +2,110 @@
 <html lang="km">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Smart Manager - Money & Time</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ប្រព័ន្ធគ្រប់គ្រងការងារឈុតអាវកីឡា</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
-<link rel="stylesheet" href="style.css">
 <body>
-<div class="app-container">
-    <header>
-        <span id="header-title">កាបូបលុយរបស់ខ្ញុំ</span>
-        <div class="balance-display" id="main-stat">$ 0.00</div>
-    </header>
-    <center>
-        <main>
-        <div id="finance-page" class="page active-page">
-            <div class="input-card">
-                <input type="text" id="fin-desc" placeholder="ប្រតិបត្តការរបស់អ្នក">
-                <input type="number" id="fin-amount" placeholder="ចំនួនទឹកប្រាក់ ($)">
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <button class="btn btn-add" onclick="saveTransaction('in')">ចំណូល</button>
-                    <button class="btn btn-add" style="background:var(--danger)" onclick="saveTransaction('out')">ចំណាយ</button>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>ប្រព័ន្ធគ្រប់គ្រងការងារឈុតអាវកីឡា</h1>
+            <p>គ្រប់គ្រងក្រុម និងធ្វើតាមដានលេខវិក្កយបត្រ</p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Left Panel: Input Form -->
+            <div class="left-panel">
+                <div class="form-section">
+                    <h2>បង្កើតក្រុមថ្មី</h2>
+                    
+                    <div class="form-group">
+                        <label>លេខវិក្កយបត្រ:</label>
+                        <input type="text" id="invoiceNumber" placeholder="ឧ. INV-001">
+                    </div>
+
+                    <div class="form-group">
+                        <label>ឈ្មោះក្រុម:</label>
+                        <input type="text" id="teamName" placeholder="ឧ. ក្រុមទីក្រុង">
+                    </div>
+
+                    <div class="form-group">
+                        <label>ចំនួនសមាជិក:</label>
+                        <input type="number" id="memberCount" placeholder="ឧ. 15" min="1">
+                    </div>
+
+                    <div class="form-group">
+                        <label>ស្ថានភាព:</label>
+                        <select id="status">
+                            <option value="រង់ចាំ">រង់ចាំ</option>
+                            <option value="កំពុងឌីហ្សាញ">កំពុងឌីហ្សាញ</option>
+                            <option value="រៀបរាប់រួច">រៀបរាប់រួច</option>
+                            <option value="បញ្ជាក់រួច">បញ្ជាក់រួច</option>
+                            <option value="ព្រីនរួច">ព្រីនរួច</option>
+                            <option value="ឆ្លងប្រគល់រួច">ឆ្លងប្រគល់រួច</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>ចំណាត់ថ្នាក់ក្រុម:</label>
+                        <input type="text" id="teamClass" placeholder="ឧ. មូលដ្ឋាន, ចម្រើន">
+                    </div>
+
+                    <button class="btn-primary" onclick="addTeam()">បន្ថែមក្រុម</button>
+                </div>
+
+                <!-- Members Input -->
+                <div class="members-section" id="membersSection" style="display: none;">
+                    <h3>បញ្ចូលឈ្មោះសមាជិក</h3>
+                    <div id="membersList"></div>
+                    <button class="btn-secondary" onclick="saveMembersNames()">✅ រក្សាឈ្មោះសមាជិក</button>
                 </div>
             </div>
-            <div id="finance-list"></div>
-        </div>
 
-        <div id="time-page" class="page">
-            <div class="input-card">
-                <input type="text" id="task-name" placeholder="តើអ្នកចង់ធ្វើអ្វី?">
-                <button class="btn btn-add" style="background:var(--secondary)" onclick="saveTask()">បន្ថែមការងារ</button>
+            <!-- Right Panel: Teams List -->
+            <div class="right-panel">
+                <div class="teams-section">
+                    <h2>ក្រុមដែលកំពុងមិនទាន់បញ្ចប់</h2>
+                    
+                    <!-- Filter Buttons -->
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" onclick="filterTeams('all')">ទាំងអស់</button>
+                        <button class="filter-btn" onclick="filterTeams('រង់ចាំ')">រង់ចាំ</button>
+                        <button class="filter-btn" onclick="filterTeams('កំពុងឌីហ្សាញ')">ឌីហ្សាញ</button>
+                        <button class="filter-btn" onclick="filterTeams('រៀបរាប់រួច')">រៀបរាប់</button>
+                        <button class="filter-btn" onclick="filterTeams('ឆ្លងប្រគល់រួច')">ប្រគល់រួច</button>
+                    </div>
+
+                    <div id="teamsList" class="teams-list"></div>
+                </div>
             </div>
-            <div id="task-list"></div>
         </div>
-    </main>
+    </div>
 
-    </center>
-    
+    <!-- Modal for Team Details -->
+    <div id="teamModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle">ព័ត៌មានលម្អិតក្រុម</h2>
+            
+            <div id="modalBody" class="modal-body"></div>
 
-    <nav>
-        <div class="nav-item active" onclick="switchPage('finance', this)">💰 ហិរញ្ញវត្ថុ</div>
-        <div class="nav-item" onclick="switchPage('time', this)">⏱️ ពេលវេលា</div>
-    </nav>
-</div>
-<script src="script.js"></script>
+            <div class="modal-actions">
+                <button class="btn-secondary" onclick="printTeamCover()">🖨️ ព្រីនក្វឺរ</button>
+                <button class="btn-secondary" onclick="printTeamList()">🖨️ ព្រីនបញ្ជីឈ្មោះ</button>
+                <button class="btn-danger" onclick="deleteTeam()">🗑️ លុប</button>
+                <button class="btn-primary" onclick="closeModal()">បិទ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Print Templates -->
+    <div id="printArea" style="display: none;">
+        <div id="printContent"></div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
