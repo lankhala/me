@@ -3,107 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ប្រព័ន្ធគ្រប់គ្រងការងារឈុតអាវកីឡា</title>
+    <title>ប្រព័ន្ធគ្រប់គ្រងកិច្ចការ</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <h1>ប្រព័ន្ធគ្រប់គ្រងការងារឈុតអាវកីឡា</h1>
-            <p>គ្រប់គ្រងក្រុម និងធ្វើតាមដានលេខវិក្កយបត្រ</p>
+            <div class="header-content">
+                <h1 class="logo">Lan Khala</h1>
+                <p class="subtitle">ប្រព័ន្ធគ្រប់គ្រងកិច្ចការបានរីកចម្រើននិងងាយស្រួល</p>
+            </div>
         </header>
 
+        <!-- Navigation Tabs -->
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="active">
+                <span>កិច្ចការកំពុងធ្វើការ</span>
+            </button>
+            <button class="tab-btn" data-tab="history">
+                <span>ប្រវត្តិ</span>
+            </button>
+        </nav>
+
         <!-- Main Content -->
-        <div class="main-content">
-            <!-- Left Panel: Input Form -->
-            <div class="left-panel">
-                <div class="form-section">
-                    <h2>បង្កើតក្រុមថ្មី</h2>
-                    
-                    <div class="form-group">
-                        <label>លេខវិក្កយបត្រ:</label>
-                        <input type="text" id="invoiceNumber" placeholder="ឧ. INV-001">
-                    </div>
-
-                    <div class="form-group">
-                        <label>ឈ្មោះក្រុម:</label>
-                        <input type="text" id="teamName" placeholder="ឧ. ក្រុមទីក្រុង">
-                    </div>
-
-                    <div class="form-group">
-                        <label>ចំនួនសមាជិក:</label>
-                        <input type="number" id="memberCount" placeholder="ឧ. 15" min="1">
-                    </div>
-
-                    <div class="form-group">
-                        <label>ស្ថានភាព:</label>
-                        <select id="status">
-                            <option value="រង់ចាំ">រង់ចាំ</option>
-                            <option value="កំពុងឌីហ្សាញ">កំពុងឌីហ្សាញ</option>
-                            <option value="រៀបរាប់រួច">រៀបរាប់រួច</option>
-                            <option value="បញ្ជាក់រួច">បញ្ជាក់រួច</option>
-                            <option value="ព្រីនរួច">ព្រីនរួច</option>
-                            <option value="ឆ្លងប្រគល់រួច">ឆ្លងប្រគល់រួច</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>ចំណាត់ថ្នាក់ក្រុម:</label>
-                        <input type="text" id="teamClass" placeholder="ឧ. មូលដ្ឋាន, ចម្រើន">
-                    </div>
-
-                    <button class="btn-primary" onclick="addTeam()">បន្ថែមក្រុម</button>
+        <main class="main-content">
+            <!-- Input Section -->
+            <section class="input-section">
+                <div class="section-header">
+                    <h2>បង្កើតកិច្ចការថ្មី</h2>
                 </div>
-
-                <!-- Members Input -->
-                <div class="members-section" id="membersSection" style="display: none;">
-                    <h3>បញ្ចូលឈ្មោះសមាជិក</h3>
-                    <div id="membersList"></div>
-                    <button class="btn-secondary" onclick="saveMembersNames()">✅ រក្សាឈ្មោះសមាជិក</button>
-                </div>
-            </div>
-
-            <!-- Right Panel: Teams List -->
-            <div class="right-panel">
-                <div class="teams-section">
-                    <h2>ក្រុមដែលកំពុងមិនទាន់បញ្ចប់</h2>
-                    
-                    <!-- Filter Buttons -->
-                    <div class="filter-buttons">
-                        <button class="filter-btn active" onclick="filterTeams('all')">ទាំងអស់</button>
-                        <button class="filter-btn" onclick="filterTeams('រង់ចាំ')">រង់ចាំ</button>
-                        <button class="filter-btn" onclick="filterTeams('កំពុងឌីហ្សាញ')">ឌីហ្សាញ</button>
-                        <button class="filter-btn" onclick="filterTeams('រៀបរាប់រួច')">រៀបរាប់</button>
-                        <button class="filter-btn" onclick="filterTeams('ឆ្លងប្រគល់រួច')">ប្រគល់រួច</button>
+                <form class="form-group" id="taskForm">
+                    <div class="form-field">
+                        <label for="taskTitle">ឈ្មោះកិច្ចការ</label>
+                        <input 
+                            type="text" 
+                            id="taskTitle" 
+                            placeholder="ឧ. ធ្វើលេខរៀងឯកសារ"
+                            maxlength="100"
+                        >
                     </div>
+                    <div class="form-field">
+                        <label for="taskDesc">ពិពណ៌នាលម្អិត</label>
+                        <textarea 
+                            id="taskDesc" 
+                            placeholder="សរសេរលម្អិតដ៏ហ្មត់ចត់អំពីកិច្ចការរបស់អ្នក..."
+                            rows="5"
+                        ></textarea>
+                    </div>
+                    <button type="submit" class="btn-primary">បន្ថែមកិច្ចការ</button>
+                </form>
+            </section>
 
-                    <div id="teamsList" class="teams-list"></div>
+            <!-- Active Tasks -->
+            <section class="task-section active-section" id="activeSection" data-section="active">
+                <div class="section-header">
+                    <h2>កិច្ចការកំពុងធ្វើការ</h2>
+                    <span class="task-count" id="activeCount">0</span>
                 </div>
-            </div>
-        </div>
+                <div id="activeList" class="task-list">
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <p>មិនមានកិច្ចការ</p>
+                        <small>ចូលបង្កើតកិច្ចការថ្មីដោយបំពេញកម្រង់ដែលនៅខាងលើ</small>
+                    </div>
+                </div>
+            </section>
+
+            <!-- History Section -->
+            <section class="task-section history-section hidden" id="historySection" data-section="history">
+                <div class="section-header">
+                    <h2>📜 ប្រវត្តិសាស្ត្របានបញ្ចប់</h2>
+                    <span class="task-count" id="historyCount">0</span>
+                </div>
+                <div id="historyList" class="task-list">
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <p>មិនមានកិច្ចការដែលបានបញ្ចប់</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© ២ ០ ២ ៦ ប្រព័ន្ធគ្រប់គ្រងកិច្ចការ | អាកបង្កើត</p>
+        </footer>
     </div>
 
-    <!-- Modal for Team Details -->
-    <div id="teamModal" class="modal">
+    <!-- Modal for Editing -->
+    <div class="modal hidden" id="editModal">
         <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <h2 id="modalTitle">ព័ត៌មានលម្អិតក្រុម</h2>
-            
-            <div id="modalBody" class="modal-body"></div>
-
-            <div class="modal-actions">
-                <button class="btn-secondary" onclick="printTeamCover()">🖨️ ព្រីនក្វឺរ</button>
-                <button class="btn-secondary" onclick="printTeamList()">🖨️ ព្រីនបញ្ជីឈ្មោះ</button>
-                <button class="btn-danger" onclick="deleteTeam()">🗑️ លុប</button>
-                <button class="btn-primary" onclick="closeModal()">បិទ</button>
+            <div class="modal-header">
+                <h3>កែសម្រួលកិច្ចការ</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
             </div>
+            <form class="form-group" id="editForm">
+                <div class="form-field">
+                    <label for="editTitle">ឈ្មោះកិច្ចការ</label>
+                    <input type="text" id="editTitle" maxlength="100">
+                </div>
+                <div class="form-field">
+                    <label for="editDesc">ពិពណ៌នាលម្អិត</label>
+                    <textarea id="editDesc" rows="5"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary">💾 រក្សាទុក</button>
+                    <button type="button" class="btn-secondary" id="cancelEdit">បោះបង់</button>
+                </div>
+            </form>
         </div>
-    </div>
-
-    <!-- Print Templates -->
-    <div id="printArea" style="display: none;">
-        <div id="printContent"></div>
     </div>
 
     <script src="script.js"></script>

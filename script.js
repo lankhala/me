@@ -1,305 +1,285 @@
 // Data Management
-let teams = [];
-let currentTeamId = null;
-let currentFilterStatus = 'all';
+const tasks = {
+    active: [],
+    history: []
+};
+
+const STORAGE_KEY = 'tasks_management';
+
+// DOM Elements
+const taskForm = document.getElementById('taskForm');
+const taskTitle = document.getElementById('taskTitle');
+const taskDesc = document.getElementById('taskDesc');
+const activeList = document.getElementById('activeList');
+const historyList = document.getElementById('historyList');
+const tabBtns = document.querySelectorAll('.tab-btn');
+const taskSections = document.querySelectorAll('.task-section');
+const editModal = document.getElementById('editModal');
+const editForm = document.getElementById('editForm');
+const editTitle = document.getElementById('editTitle');
+const editDesc = document.getElementById('editDesc');
+const closeModal = document.getElementById('closeModal');
+const cancelEdit = document.getElementById('cancelEdit');
+const activeCount = document.getElementById('activeCount');
+const historyCount = document.getElementById('historyCount');
+
+let editingTaskId = null;
+let editingTaskType = null;
 
 // Initialize
-document.addEventListener('DOMContentLoaded', () => {
-    loadTeamsFromStorage();
-    renderTeamsList();
-});
+function init() {
+    loadTasks();
+    renderTasks();
+    setupEventListeners();
+}
 
-// Load teams from localStorage
-function loadTeamsFromStorage() {
-    const stored = localStorage.getItem('teams');
-    if (stored) {
-        teams = JSON.parse(stored);
+// Event Listeners
+function setupEventListeners() {
+    taskForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        addTask();
+    });
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    closeModal.addEventListener('click', () => closeEditModal());
+    cancelEdit.addEventListener('click', () => closeEditModal());
+    editForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        saveEdit();
+    });
+
+    editModal.addEventListener('click', (e) => {
+        if (e.target === editModal) closeEditModal();
+    });
+}
+
+// Storage Functions
+function saveTasks() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+}
+
+function loadTasks() {
+    const data = localStorage.getItem(STORAGE_KEY);
+    if (data) {
+        const parsed = JSON.parse(data);
+        tasks.active = parsed.active || [];
+        tasks.history = parsed.history || [];
     }
 }
 
-// Save teams to localStorage
-function saveTeamsToStorage() {
-    localStorage.setItem('teams', JSON.stringify(teams));
-    renderTeamsList();
+// Utility Functions
+function generateId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
 }
 
-// Add Team
-function addTeam() {
-    const invoiceNumber = document.getElementById('invoiceNumber').value.trim();
-    const teamName = document.getElementById('teamName').value.trim();
-    const memberCount = parseInt(document.getElementById('memberCount').value);
-    const status = document.getElementById('status').value;
-    const teamClass = document.getElementById('teamClass').value.trim();
+function getFormattedDate() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}`;
+}
 
-    if (!invoiceNumber || !teamName || !memberCount || !teamClass) {
-        alert('សូមបំពេញព័ត៌មានលម្អិតទាំងអស់');
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+}
+
+// Task Management
+function addTask() {
+    const title = taskTitle.value.trim();
+    const desc = taskDesc.value.trim();
+
+    if (!title || !desc) {
+        alert('សូមបំពេញឈ្មោះ និងពិពណ៌នាលម្អិត');
         return;
     }
 
-    const team = {
-        id: Date.now(),
-        invoiceNumber,
-        teamName,
-        memberCount,
-        status,
-        teamClass,
-        members: Array(memberCount).fill(''),
-        createdDate: new Date().toLocaleDateString('km-KH'),
-        coverage: '',
-        updatedDate: new Date().toLocaleDateString('km-KH')
+    const task = {
+        id: generateId(),
+        title,
+        desc,
+        createdAt: getFormattedDate(),
+        completedAt: null
     };
 
-    teams.push(team);
-    saveTeamsToStorage();
-
-    // Show members input section
-    currentTeamId = team.id;
-    showMembersInput(memberCount);
-
-    // Clear form
-    document.getElementById('invoiceNumber').value = '';
-    document.getElementById('teamName').value = '';
-    document.getElementById('memberCount').value = '';
-    document.getElementById('status').value = 'រង់ចាំ';
-    document.getElementById('teamClass').value = '';
+    tasks.active.push(task);
+    saveTasks();
+    renderTasks();
+    taskForm.reset();
+    taskTitle.focus();
 }
 
-// Show members input
-function showMembersInput(count) {
-    const section = document.getElementById('membersSection');
-    const list = document.getElementById('membersList');
-    
-    let html = '';
-    for (let i = 0; i < count; i++) {
-        html += `
-            <div class="member-input-group">
-                <span>${i + 1}</span>
-                <input type="text" placeholder="ឈ្មោះសមាជិក" id="member-${i}">
-            </div>
-        `;
+function completeTask(id) {
+    const taskIndex = tasks.active.findIndex(t => t.id === id);
+    if (taskIndex !== -1) {
+        const task = tasks.active[taskIndex];
+        task.completedAt = getFormattedDate();
+        tasks.history.push(task);
+        tasks.active.splice(taskIndex, 1);
+        saveTasks();
+        renderTasks();
     }
-    
-    list.innerHTML = html;
-    section.style.display = 'block';
-    section.scrollIntoView({ behavior: 'smooth' });
 }
 
-// Save members names
-function saveMembersNames() {
-    if (currentTeamId) {
-        const team = teams.find(t => t.id === currentTeamId);
-        if (team) {
-            for (let i = 0; i < team.memberCount; i++) {
-                const input = document.getElementById(`member-${i}`);
-                team.members[i] = input ? input.value.trim() : '';
-            }
-            team.updatedDate = new Date().toLocaleDateString('km-KH');
-            saveTeamsToStorage();
-            
-            // Reset
-            currentTeamId = null;
-            document.getElementById('membersSection').style.display = 'none';
-            alert('✅ រក្សាឈ្មោះសមាជិកបានដោយជោគជ័យ');
+function deleteTask(id, type) {
+    if (confirm('តើអ្នកប្រាកដថាចង់លុបកិច្ចការនេះ?')) {
+        if (type === 'active') {
+            tasks.active = tasks.active.filter(t => t.id !== id);
+        } else {
+            tasks.history = tasks.history.filter(t => t.id !== id);
         }
+        saveTasks();
+        renderTasks();
     }
 }
 
-// Filter teams
-function filterTeams(status) {
-    currentFilterStatus = status;
-    
-    // Update active button
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    event.target.classList.add('active');
-    
-    renderTeamsList();
+function openEditModal(id, type) {
+    editingTaskId = id;
+    editingTaskType = type;
+    const taskList = type === 'active' ? tasks.active : tasks.history;
+    const task = taskList.find(t => t.id === id);
+
+    if (task) {
+        editTitle.value = task.title;
+        editDesc.value = task.desc;
+        editModal.classList.remove('hidden');
+        editTitle.focus();
+    }
 }
 
-// Render teams list
-function renderTeamsList() {
-    const list = document.getElementById('teamsList');
-    
-    let filtered = teams;
-    if (currentFilterStatus !== 'all') {
-        filtered = teams.filter(t => t.status === currentFilterStatus);
-    }
+function closeEditModal() {
+    editModal.classList.add('hidden');
+    editingTaskId = null;
+    editingTaskType = null;
+    editForm.reset();
+}
 
-    if (filtered.length === 0) {
-        list.innerHTML = '<p style="text-align: center; color: #9ca3af; padding: 30px;">មិនមានក្រុមនៅដែរ</p>';
+function saveEdit() {
+    const title = editTitle.value.trim();
+    const desc = editDesc.value.trim();
+
+    if (!title || !desc) {
+        alert('សូមបំពេញឈ្មោះ និងពិពណ៌នាលម្អិត');
         return;
     }
 
-    let html = '';
-    filtered.forEach(team => {
-        const completedMembers = team.members.filter(m => m).length;
-        html += `
-            <div class="team-card status-${team.status.replace(/\s+/g, '-')}" onclick="openTeamModal(${team.id})">
-                <div class="team-info">
-                    <h3>${team.invoiceNumber} - ${team.teamName}</h3>
-                    <p><strong>ឈុត:</strong> ${team.teamClass}</p>
-                    <p><strong>សមាជិក:</strong> ${completedMembers}/${team.memberCount}</p>
-                    <p><strong>បង្កើត:</strong> ${team.createdDate}</p>
-                </div>
-                <div style="text-align: right;">
-                    <div class="team-status status-${team.status.replace(/\s+/g, '-')}">${team.status}</div>
-                </div>
+    const taskList = editingTaskType === 'active' ? tasks.active : tasks.history;
+    const task = taskList.find(t => t.id === editingTaskId);
+
+    if (task) {
+        task.title = title;
+        task.desc = desc;
+        saveTasks();
+        renderTasks();
+        closeEditModal();
+    }
+}
+
+// Rendering Functions
+function renderTasks() {
+    renderActiveTasks();
+    renderHistoryTasks();
+    updateCounts();
+}
+
+function updateCounts() {
+    activeCount.textContent = tasks.active.length;
+    historyCount.textContent = tasks.history.length;
+}
+
+function renderActiveTasks() {
+    activeList.innerHTML = '';
+
+    if (tasks.active.length === 0) {
+        activeList.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <p>មិនមានកិច្ចការ</p>
+                <small>ចូលបង្កើតកិច្ចការថ្មីដោយបំពេញកម្រង់ខាងលើ</small>
             </div>
         `;
+        return;
+    }
+
+    tasks.active.forEach(task => {
+        activeList.appendChild(createTaskCard(task, 'active'));
     });
-
-    list.innerHTML = html;
 }
 
-// Open team modal
-function openTeamModal(teamId) {
-    const team = teams.find(t => t.id === teamId);
-    if (!team) return;
+function renderHistoryTasks() {
+    historyList.innerHTML = '';
 
-    currentTeamId = teamId;
-    const modal = document.getElementById('teamModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalBody = document.getElementById('modalBody');
-
-    modalTitle.textContent = `${team.invoiceNumber} - ${team.teamName}`;
-
-    const completedMembers = team.members.filter(m => m).length;
-    const membersList = team.members.filter(m => m).map(m => `<li>${m}</li>`).join('');
-
-    let html = `
-        <p><strong>លេខវិក្កយបត្រ:</strong> <span>${team.invoiceNumber}</span></p>
-        <p><strong>ឈ្មោះក្រុម:</strong> <span>${team.teamName}</span></p>
-        <p><strong>ឈុត:</strong> <span>${team.teamClass}</span></p>
-        <p><strong>ចំនួនសមាជិក:</strong> <span>${team.memberCount}</span></p>
-        <p><strong>ឈ្មោះបានបញ្ចូល:</strong> <span>${completedMembers}/${team.memberCount}</span></p>
-        <p><strong>ស្ថានភាព:</strong> <span>${team.status}</span></p>
-        <p><strong>កាលបរិច្ឆេទបង្កើត:</strong> <span>${team.createdDate}</span></p>
-        <p><strong>កាលបរិច្ឆេទកែសម្រួល:</strong> <span>${team.updatedDate}</span></p>
-    `;
-
-    if (membersList) {
-        html += `
-            <div class="members-list-modal">
-                <h4>📝 បញ្ជីឈ្មោះ</h4>
-                <ul>${membersList}</ul>
+    if (tasks.history.length === 0) {
+        historyList.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">📭</div>
+                <p>មិនមានកិច្ចការដែលបានបញ្ចប់</p>
             </div>
         `;
+        return;
     }
 
-    modalBody.innerHTML = html;
-    modal.classList.add('show');
+    tasks.history.forEach(task => {
+        historyList.appendChild(createTaskCard(task, 'history'));
+    });
 }
 
-// Close modal
-function closeModal() {
-    const modal = document.getElementById('teamModal');
-    modal.classList.remove('show');
-    currentTeamId = null;
-}
+function createTaskCard(task, type) {
+    const card = document.createElement('div');
+    card.className = `task-card ${type === 'history' ? 'completed' : ''}`;
+    
+    const completedInfo = task.completedAt 
+        ? `<div class="task-date">✅ បានបញ្ចប់: ${task.completedAt}</div>`
+        : '';
 
-// Print team cover
-function printTeamCover() {
-    const team = teams.find(t => t.id === currentTeamId);
-    if (!team) return;
-
-    const printWindow = window.open('', '', 'height=600,width=800');
-    const html = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>ក្វឺរក្រុម</title>
-            <style>
-                body { font-family: Arial; text-align: center; padding: 40px; }
-                .cover { border: 3px solid #333; padding: 60px; margin: 30px; }
-                h1 { font-size: 28px; margin: 20px 0; }
-                p { font-size: 18px; margin: 15px 0; }
-                .footer { margin-top: 80px; border-top: 2px solid #333; padding-top: 20px; }
-            </style>
-        </head>
-        <body>
-            <div class="cover">
-                <h1>${team.teamName}</h1>
-                <p><strong>លេខវិក្កយបត្រ:</strong> ${team.invoiceNumber}</p>
-                <p><strong>ឈុត:</strong> ${team.teamClass}</p>
-                <p><strong>ចំនួនសមាជិក:</strong> ${team.memberCount}</p>
-                <p><strong>ស្ថានភាព:</strong> ${team.status}</p>
-                <div class="footer">
-                    <p>បង្កើត: ${team.createdDate}</p>
-                </div>
+    const actions = type === 'active'
+        ? `
+            <div class="task-actions">
+                <button class="btn-small btn-complete" onclick="completeTask('${task.id}')">✓ បញ្ចប់</button>
+                <button class="btn-small btn-edit" onclick="openEditModal('${task.id}', 'active')">✎ កែ</button>
+                <button class="btn-small btn-delete" onclick="deleteTask('${task.id}', 'active')">🗑 លុប</button>
             </div>
-        </body>
-        </html>
-    `;
-    printWindow.document.write(html);
-    printWindow.document.close();
-    setTimeout(() => printWindow.print(), 250);
-}
-
-// Print team list
-function printTeamList() {
-    const team = teams.find(t => t.id === currentTeamId);
-    if (!team) return;
-
-    const membersList = team.members.filter(m => m).map((m, i) => `<tr><td>${i + 1}</td><td>${m}</td></tr>`).join('');
-
-    const printWindow = window.open('', '', 'height=600,width=800');
-    const html = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="UTF-8">
-            <title>បញ្ជីឈ្មោះ</title>
-            <style>
-                body { font-family: Arial; padding: 20px; }
-                h1 { text-align: center; }
-                table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-                th, td { border: 1px solid #333; padding: 10px; text-align: left; }
-                th { background-color: #f0f0f0; font-weight: bold; }
-                .header-info { margin-bottom: 20px; }
-            </style>
-        </head>
-        <body>
-            <h1>បញ្ជីឈ្មោះក្រុម</h1>
-            <div class="header-info">
-                <p><strong>ក្រុម:</strong> ${team.teamName}</p>
-                <p><strong>លេខវិក្កយបត្រ:</strong> ${team.invoiceNumber}</p>
-                <p><strong>ឈុត:</strong> ${team.teamClass}</p>
+        `
+        : `
+            <div class="task-actions">
+                <button class="btn-small btn-edit" onclick="openEditModal('${task.id}', 'history')">✎ កែ</button>
+                <button class="btn-small btn-delete" onclick="deleteTask('${task.id}', 'history')">🗑 លុប</button>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 50px;">ល.រ</th>
-                        <th>ឈ្មោះសមាជិក</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${membersList}
-                </tbody>
-            </table>
-            <p style="text-align: right; margin-top: 40px;">កាលបរិច្ឆេទ: ________________</p>
-        </body>
-        </html>
+        `;
+
+    card.innerHTML = `
+        <div class="task-title">${escapeHtml(task.title)}</div>
+        <div class="task-desc">${escapeHtml(task.desc)}</div>
+        <div class="task-meta">
+            <div class="task-date">📅 បង្កើត: ${task.createdAt}</div>
+            ${completedInfo}
+        </div>
+        ${actions}
     `;
-    printWindow.document.write(html);
-    printWindow.document.close();
-    setTimeout(() => printWindow.print(), 250);
+
+    return card;
 }
 
-// Delete team
-function deleteTeam() {
-    if (confirm('តើអ្នកប្រាកដថាចង់លុបក្រុមនេះឬ?')) {
-        teams = teams.filter(t => t.id !== currentTeamId);
-        saveTeamsToStorage();
-        closeModal();
-    }
+// Tab Switching
+function switchTab(tabName) {
+    tabBtns.forEach(btn => btn.classList.remove('active'));
+    taskSections.forEach(section => section.classList.add('hidden'));
+
+    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+    document.querySelector(`[data-section="${tabName}"]`).classList.remove('hidden');
 }
 
-// Close modal when clicking outside
-window.onclick = function(event) {
-    const modal = document.getElementById('teamModal');
-    if (event.target === modal) {
-        modal.classList.remove('show');
-    }
-}
+// Start App
+init();
