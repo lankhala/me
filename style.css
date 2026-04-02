@@ -1,0 +1,163 @@
+@font-face {
+    font-family: 'GoogleSans-Medium';
+    src: url('GoogleSans-Medium.ttf');
+}
+
+:root {
+    /* Light Mode Colors */
+    --bg-color: #f0f7ff;
+    --header-bg: linear-gradient(135deg, #ffffff 0%, #e3f2fd 100%);
+    --card-bg: #ffffff;
+    --text-main: #2c3e50;
+    --text-muted: #64748b;
+    --border-color: #d1e3f8;
+    --primary-blue: #007bff;
+    --nav-bg: #ffffff;
+    --col-bg: #f8fbff;
+}
+
+/* Dark Mode Overrides */
+.dark-mode {
+    --bg-color: #1a1d21;
+    --header-bg: linear-gradient(135deg, #24292e 0%, #1a1d21 100%);
+    --card-bg: #2d333b;
+    --text-main: #adbac7;
+    --text-muted: #768390;
+    --border-color: #444c56;
+    --primary-blue: #539bf5;
+    --nav-bg: #22272e;
+    --col-bg: #22272e;
+}
+
+* { 
+    box-sizing: border-box; 
+    font-family: 'GoogleSans-Medium', sans-serif; 
+    /* មិនប្រើ font-weight ដើម្បីការពារអក្សរខូច */
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    margin: 0;
+    transition: background 0.3s ease;
+}
+
+.app-header {
+    background: var(--header-bg);
+    padding: 20px;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.theme-switch-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.btn-theme {
+    padding: 8px 15px;
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+.app-nav {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 15px;
+    background: var(--nav-bg);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.nav-btn {
+    padding: 10px 25px;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    color: var(--text-main);
+    border-radius: 30px;
+    cursor: pointer;
+}
+
+.nav-btn.active { background: var(--primary-blue); color: white; }
+
+.input-container { 
+    background: var(--card-bg); 
+    padding: 20px; 
+    border-radius: 15px; 
+    margin: 20px auto; 
+    max-width: 800px; 
+    border: 1px solid var(--border-color);
+}
+
+.input-group input { 
+    flex: 1; padding: 12px; 
+    border: 1px solid var(--border-color); 
+    border-radius: 8px; 
+    background: var(--bg-color); 
+    color: var(--text-main);
+}
+
+/* Horizontal Scroll Area */
+.board-wrapper { 
+    overflow-x: auto; 
+    padding: 20px; 
+    display: flex; 
+    scroll-behavior: smooth; /* ធ្វើឱ្យការរំកិលមានភាពរលូន */
+}
+
+.task-board { display: flex; gap: 20px; padding-bottom: 20px; }
+
+.stage-col {
+    min-width: 320px;
+    background: var(--col-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.stage-col p {
+    padding: 15px; margin: 0;
+    background: var(--border-color);
+    color: var(--text-main);
+    text-align: center;
+    border-radius: 12px 12px 0 0;
+}
+
+.task-list { padding: 12px; min-height: 150px; }
+
+.task-card {
+    background: var(--card-bg);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    border: 1px solid var(--border-color);
+    border-left: 5px solid var(--primary-blue);
+}
+
+.btn-next {
+    width: 100%; padding: 8px;
+    background: var(--primary-blue);
+    color: white; border: none;
+    border-radius: 6px; cursor: pointer;
+    margin-top: 10px;
+}
+
+.btn-prev {
+    width: 100%; padding: 8px;
+    background: var(--border-color);
+    color: var(--text-main); border: none;
+    border-radius: 6px; cursor: pointer;
+    margin-top: 5px;
+}
+
+.view-section { display: none; }
+.view-section.active { display: block; }
+
+.history-card { background: var(--card-bg); padding: 25px; border-radius: 15px; max-width: 900px; margin: 0 auto; border: 1px solid var(--border-color); }
